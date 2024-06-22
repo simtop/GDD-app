@@ -53,7 +53,8 @@ enum class WaterType(val id: Int) {
     DISTILLED(1),
     BOTTLED(2),
     TAP(3),
-    WELL(4)
+    WELL(4),
+    UNKNOWN(5)
 }
 
 enum class SampleAge(val id: String) {
@@ -119,7 +120,7 @@ data class Captures(
         else
         {
             inProgress = this.inProgressCapture
-            completed = completedCaptures.filterIndexed { ix, element ->
+            completed = completedCaptures.filterIndexed { _, element ->
                 element.image.compareTo(path) != 0
             }
         }

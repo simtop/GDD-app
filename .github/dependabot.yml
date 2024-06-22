@@ -8,16 +8,8 @@ updates:
   - package-ecosystem: "gradle"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "monthly"
     labels:
       - "gradle"
-      - "dependabot"
-      - "dependencies"
-  - package-ecosystem: "npm"
-    directory: "/firebase/functions/"
-    schedule:
-      interval: "daily"
-    labels:
-      - "npm"
       - "dependabot"
       - "dependencies"

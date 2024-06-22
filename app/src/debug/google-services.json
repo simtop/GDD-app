@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "137073874647",
+    "project_id": "aiscope-labelling-app-test",
+    "storage_bucket": "aiscope-labelling-app-test.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:137073874647:android:bed7baef45d8ade805c292",
+        "android_client_info": {
+          "package_name": "net.aiscope.gdd_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "137073874647-ji82cdhc4h9tvin24d8ti41i9ga60qkm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1T4STVsqlo5ymmPbIpKkwb083yV5MTPM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "137073874647-ji82cdhc4h9tvin24d8ti41i9ga60qkm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:137073874647:android:548b4e630b648d5405c292",
+        "android_client_info": {
+          "package_name": "net.aiscope.gdd_app.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "137073874647-ji82cdhc4h9tvin24d8ti41i9ga60qkm.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA1T4STVsqlo5ymmPbIpKkwb083yV5MTPM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "137073874647-ji82cdhc4h9tvin24d8ti41i9ga60qkm.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

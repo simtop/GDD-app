@@ -16,8 +16,7 @@ import com.github.chrisbanes.photoview.PhotoView
 import net.aiscope.gdd_app.extensions.x
 
 @Suppress("TooManyFunctions")
-//TODO("Rename to PhotoMaskView")
-class MaskCustomView @JvmOverloads constructor(
+class PhotoMaskView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
@@ -43,7 +42,7 @@ class MaskCustomView @JvmOverloads constructor(
     init {
         maximumScale = MAX_SCALE
 
-        setOnMatrixChangeListener { _ ->
+        setOnMatrixChangeListener {
             val imageMatrixArray = FloatArray(MATRIX_SIZE).apply { imageMatrix.getValues(this) }
             val scale = imageMatrixArray[Matrix.MSCALE_X]
             maskLayer.currentScale = scale
@@ -107,15 +106,15 @@ class MaskCustomView @JvmOverloads constructor(
         readyForEvents = true
     }
 
-    override fun onSaveInstanceState(): Parcelable? =
-        MaskCustomViewSavedState(
+    override fun onSaveInstanceState(): Parcelable =
+        PhotoMaskViewSavedState(
             super.onSaveInstanceState(),
             maskLayer.getInstanceState()
         )
 
     override fun onRestoreInstanceState(state: Parcelable?) {
         super.onRestoreInstanceState(state)
-        if (state is MaskCustomViewSavedState) {
+        if (state is PhotoMaskViewSavedState) {
             maskLayer.restoreInstanceState(state.maskLayerState)
         }
     }
@@ -165,6 +164,6 @@ class MaskCustomView @JvmOverloads constructor(
         readyForEvents = false
     }
 
-    class MaskCustomViewSavedState(superState: Parcelable?, val maskLayerState: Parcelable) :
+    class PhotoMaskViewSavedState(superState: Parcelable?, val maskLayerState: Parcelable) :
         BaseSavedState(superState)
 }

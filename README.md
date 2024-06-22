@@ -10,7 +10,7 @@
 
 Requirements:
 
-1. Java 8
+1. Java 17
 1. Android Studio
 1. Android SDK
 
@@ -44,8 +44,9 @@ https://www.raywenderlich.com/library?domain_ids%5B%5D=2
 Android course:  
 https://developer.android.com/courses  
 
+
 ## Further documentation
-Find more documentation in the [doc](doc folder), for example:
+Find more documentation in the [doc folder](doc), for example:
 
 * [Application architecture](doc/architecture.md)
 * [UI Design](doc/UI-Design.md)

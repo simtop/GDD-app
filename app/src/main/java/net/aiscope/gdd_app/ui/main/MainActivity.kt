@@ -69,9 +69,10 @@ class MainActivity : AppCompatActivity(), SelectDiseaseView, LogoutFLow {
     override fun goToCaptureImage(nextImageName: String) {
         val intent = Intent(this, CaptureImageActivity::class.java)
         intent.putExtra(CaptureImageActivity.EXTRA_IMAGE_NAME, nextImageName)
+        intent.putExtra(CaptureImageActivity.CAPTURE_IMAGE_FROM, MAIN_ACTIVITY_NAME)
         this.startActivity(intent)
     }
-    
+
     override fun logout(success: Boolean) = if (success) {
         startActivity(Intent(this, LoginActivity::class.java))
         finish()
@@ -79,7 +80,7 @@ class MainActivity : AppCompatActivity(), SelectDiseaseView, LogoutFLow {
         Toast.makeText(this, R.string.error_message_logout_failure, Toast.LENGTH_SHORT).show()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
     }
@@ -96,4 +97,8 @@ class MainActivity : AppCompatActivity(), SelectDiseaseView, LogoutFLow {
     }
 
     override fun logoutAction() = this.presenter.logout()
+
+    companion object {
+        const val MAIN_ACTIVITY_NAME = "MainActivity"
+    }
 }

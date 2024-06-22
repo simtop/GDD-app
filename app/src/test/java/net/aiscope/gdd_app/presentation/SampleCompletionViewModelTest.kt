@@ -1,6 +1,7 @@
 package net.aiscope.gdd_app.presentation
 
 import android.content.Context
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.argumentCaptor
 import com.nhaarman.mockito_kotlin.verify
@@ -19,11 +20,13 @@ import net.aiscope.gdd_app.model.WaterType
 import net.aiscope.gdd_app.network.RemoteStorage
 import net.aiscope.gdd_app.repository.MicroscopistRepository
 import net.aiscope.gdd_app.repository.SampleRepository
+import net.aiscope.gdd_app.repository.SampleRepositoryFirestore
 import net.aiscope.gdd_app.ui.sample_completion.SampleCompletionViewModel
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TestRule
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
@@ -31,6 +34,10 @@ import org.mockito.junit.MockitoJUnitRunner
 @ExperimentalCoroutinesApi
 @RunWith(MockitoJUnitRunner::class)
 class SampleCompletionViewModelTest {
+
+    @get:Rule
+    var rule: TestRule = InstantTaskExecutorRule()
+
     companion object {
         private val sample = Sample("an id", "a facility", "a microscopist", "a disease")
         private val lastSample = sample.copy(
@@ -69,6 +76,9 @@ class SampleCompletionViewModelTest {
     @Mock
     private lateinit var microscopistRepository: MicroscopistRepository
 
+    @Mock
+    private lateinit var sampleRepositoryFirestore: SampleRepositoryFirestore
+
     @Before
     fun before() {
         coroutinesTestRule.runBlockingTest {
@@ -89,7 +99,10 @@ class SampleCompletionViewModelTest {
 
             whenever(repository.current()).thenReturn(sample)
 
-            viewModel = SampleCompletionViewModel(repository, remoteStorage, context, microscopistRepository)
+            viewModel = SampleCompletionViewModel(
+                repository, remoteStorage, context,
+                microscopistRepository, sampleRepositoryFirestore
+            )
         }
     }
 
@@ -201,7 +214,7 @@ class SampleCompletionViewModelTest {
     fun `Should upload updated sample to remote storage`() {
         coroutinesTestRule.runBlockingTest {
             //So we expect the values returned here to be in the one that gets enqueued
-            whenever(repository.store(any())).thenReturn(lastSample);
+            whenever(repository.store(any())).thenReturn(lastSample)
 
             viewModel.sampleAge = "Fresh"
             viewModel.waterType = "Well"

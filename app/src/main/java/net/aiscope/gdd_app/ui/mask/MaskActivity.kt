@@ -1,5 +1,6 @@
 package net.aiscope.gdd_app.ui.mask
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
@@ -12,6 +13,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import dagger.android.AndroidInjection
 import kotlinx.coroutines.Dispatchers
@@ -25,6 +27,7 @@ import net.aiscope.gdd_app.ui.CaptureFlow
 import net.aiscope.gdd_app.ui.attachCaptureFlowToolbar
 import net.aiscope.gdd_app.ui.goToHomeAndFinishActivity
 import net.aiscope.gdd_app.ui.sample_completion.SampleCompletionActivity
+import net.aiscope.gdd_app.ui.sample_completion.metadata.MetadataFragment.Companion.METADATA_CLASS_NAME
 import net.aiscope.gdd_app.ui.showConfirmBackDialog
 import net.aiscope.gdd_app.ui.util.BitmapReader
 import net.aiscope.gdd_app.ui.util.BitmapReader.MAX_TEXTURE_SIZE
@@ -41,6 +44,7 @@ class MaskActivity : AppCompatActivity(), MaskView, CaptureFlow {
         const val EXTRA_IMAGE_NAME = "net.aiscope.gdd_app.ui.mask.MaskActivity.EXTRA_IMAGE_NAME"
         const val EXTRA_MASK_NAME = "net.aiscope.gdd_app.ui.mask.MaskActivity.EXTRA_MASK_NAME"
         const val EXTRA_MASK_PATH = "net.aiscope.gdd_app.ui.mask.MaskActivity.EXTRA_MASK_PATH"
+        const val EXTRA_MASK_FROM = "EXTRA_MASK_FROM"
     }
 
     @Inject
@@ -110,7 +114,7 @@ class MaskActivity : AppCompatActivity(), MaskView, CaptureFlow {
 
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.mask_menu, menu)
         return true
     }
@@ -157,6 +161,7 @@ class MaskActivity : AppCompatActivity(), MaskView, CaptureFlow {
     }
 
     override fun takeMask(maskName: String, onPhotoReceived: suspend (File?) -> Unit) {
+        binding.maskLoadingModal.isVisible = true
         binding.photoMaskView.stopDrawing()
         val bmp = binding.photoMaskView.getMaskBitmap()
         lifecycleScope.launch {
@@ -168,10 +173,16 @@ class MaskActivity : AppCompatActivity(), MaskView, CaptureFlow {
     }
 
     override fun goToSampleCompletion() {
-        val intent = Intent(this, SampleCompletionActivity::class.java)
-        startActivity(intent)
-        //Finish the activity to avoid keeping all the bitmaps in memory
-        finish()
+        val maskFrom = intent.getStringExtra(EXTRA_MASK_FROM)
+
+        if(maskFrom == METADATA_CLASS_NAME) {
+            finish()
+        } else {
+            val intent = Intent(this, SampleCompletionActivity::class.java)
+            startActivity(intent)
+            //Finish the activity to avoid keeping all the bitmaps in memory
+            finish()
+        }
     }
 
     override fun notifyImageCouldNotBeTaken() {
@@ -210,6 +221,7 @@ class MaskActivity : AppCompatActivity(), MaskView, CaptureFlow {
         binding.redoBtn.visibility = savedInstanceState.getInt("redo_btn-visibility", View.INVISIBLE)
     }
 
+    @SuppressLint("MissingSuperCall")
     override fun onBackPressed() {
         showConfirmBackDialog()
     }

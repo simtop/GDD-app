@@ -1,15 +1,17 @@
 package net.aiscope.gdd_app.ui.sample_completion
 
 import android.content.Context
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.aiscope.gdd_app.R
-import net.aiscope.gdd_app.model.SampleAge
 import net.aiscope.gdd_app.model.CompletedCapture
 import net.aiscope.gdd_app.model.MicroscopeQuality
 import net.aiscope.gdd_app.model.Sample
+import net.aiscope.gdd_app.model.SampleAge
 import net.aiscope.gdd_app.model.SampleMetadata
 import net.aiscope.gdd_app.model.SamplePreparation
 import net.aiscope.gdd_app.model.SampleStatus
@@ -17,18 +19,25 @@ import net.aiscope.gdd_app.model.WaterType
 import net.aiscope.gdd_app.network.RemoteStorage
 import net.aiscope.gdd_app.repository.MicroscopistRepository
 import net.aiscope.gdd_app.repository.SampleRepository
+import net.aiscope.gdd_app.repository.SampleRepositoryFirestore
 import net.aiscope.gdd_app.ui.sample_completion.metadata.MetadataMapper
 import javax.inject.Inject
 
+@Suppress("TooManyFunctions")
 class SampleCompletionViewModel @Inject constructor(
     private val repository: SampleRepository,
     private val remoteStorage: RemoteStorage,
     private val context: Context,
-    private val microscopistRepository: MicroscopistRepository
+    private val microscopistRepository: MicroscopistRepository,
+    private val sampleRepositoryFirestore: SampleRepositoryFirestore
 ) : ViewModel() {
     companion object {
         const val DEFAULT_MAGNIFICATION: Int = 1000
     }
+
+    private val _samples = MutableLiveData<Sample>()
+    val samples: LiveData<Sample>
+        get() = _samples
 
     // Improvement: We got a nicer way of fixing default vals??
     // Fields for the metadata tab
@@ -66,6 +75,7 @@ class SampleCompletionViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
 
             val sample = repository.current()
+            _samples.postValue(sample)
             disease = sample.disease
             captures = sample.captures.completedCaptures
 
@@ -92,6 +102,13 @@ class SampleCompletionViewModel @Inject constructor(
                 reusesSlides = it.reusesSlides
                 sampleAge = getSampleAgeValue(it.sampleAge)
             }
+        }
+    }
+
+    fun getSamples() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val sample = repository.current()
+            _samples.postValue(sample)
         }
     }
 
@@ -132,11 +149,12 @@ class SampleCompletionViewModel @Inject constructor(
                     microscopistRepository.load().copy(hasSubmitSampleFirstTime = true)
                 )
             }
+            sampleRepositoryFirestore.store(storedSample)
         }
     }
 
     fun hasUserSubmitSampleFirstTime() : Boolean {
-       return microscopistRepository.load().hasSubmitSampleFirstTime
+        return microscopistRepository.load().hasSubmitSampleFirstTime
     }
 
     private fun getWaterType(waterTypeValue: String): WaterType {
@@ -145,7 +163,8 @@ class SampleCompletionViewModel @Inject constructor(
             context.getString(R.string.water_type_bottled) -> WaterType.BOTTLED
             context.getString(R.string.water_type_tap) -> WaterType.TAP
             context.getString(R.string.water_type_well) -> WaterType.WELL
-            else -> throw IllegalStateException("$waterTypeValue water type is unknown")
+            context.getString(R.string.water_type_unknown) -> WaterType.UNKNOWN
+            else -> error("$waterTypeValue water type is not allowed")
         }
     }
 
@@ -155,7 +174,18 @@ class SampleCompletionViewModel @Inject constructor(
             WaterType.BOTTLED -> context.getString(R.string.water_type_bottled)
             WaterType.TAP -> context.getString(R.string.water_type_tap)
             WaterType.WELL -> context.getString(R.string.water_type_well)
+            WaterType.UNKNOWN -> context.getString(R.string.water_type_unknown)
             null -> ""
+        }
+    }
+
+    @Suppress("SwallowedException")
+    fun isValidWaterTypeValue(waterTypeValue: String): Boolean {
+        return try {
+            getWaterType(waterTypeValue)
+            true
+        } catch (e: IllegalStateException) {
+            false
         }
     }
 
@@ -163,7 +193,7 @@ class SampleCompletionViewModel @Inject constructor(
         return when (sampleAgeValue) {
             context.getString(R.string.sample_age_fresh) -> SampleAge.FRESH
             context.getString(R.string.sample_age_old) -> SampleAge.OLD
-            else -> throw IllegalStateException("$sampleAgeValue sample age is unknown")
+            else -> error("$sampleAgeValue sample age is not allowed")
         }
     }
 
@@ -172,6 +202,16 @@ class SampleCompletionViewModel @Inject constructor(
             SampleAge.FRESH -> context.getString(R.string.sample_age_fresh)
             SampleAge.OLD -> context.getString(R.string.sample_age_old)
             null -> ""
+        }
+    }
+
+    @Suppress("SwallowedException")
+    fun isValidSampleAgeValue(sampleAgeValue: String): Boolean {
+        return try{
+            getSampleAge(sampleAgeValue)
+            true
+        } catch (e: IllegalStateException) {
+            false
         }
     }
 
